@@ -12,12 +12,12 @@ import {
 } from 'lucide-react';
 
 const AVAILABLE_TRADERS = [
-  { id: 1, name: 'Alex Thompson', winRate: '84%', return: '+124%', followers: 1205, risk: 'Low', dailyReturn: '124%', trades: 324 },
-  { id: 2, name: 'Sarah Chen', winRate: '79%', return: '+89%', followers: 850, risk: 'Medium', dailyReturn: '89%', trades: 215 },
-  { id: 3, name: 'Marco Rossi', winRate: '92%', return: '+215%', followers: 3400, risk: 'High', dailyReturn: '215%', trades: 512 },
-  { id: 4, name: 'Elena Petrova', winRate: '81%', return: '+67%', followers: 420, risk: 'Low', dailyReturn: '67%', trades: 189 },
-  { id: 5, name: 'James Wilson', winRate: '77%', return: '+45%', followers: 640, risk: 'Medium', dailyReturn: '45%', trades: 156 },
-  { id: 6, name: 'Lisa Anderson', winRate: '88%', return: '+178%', followers: 2100, risk: 'High', dailyReturn: '178%', trades: 398 },
+  { id: 1, name: 'Alex Thompson', winRate: '84%', return: '+124%', followers: 1205, risk: 'Low', dailyReturn: '124%', trades: 324, minAllocation: 500 },
+  { id: 2, name: 'Sarah Chen', winRate: '79%', return: '+89%', followers: 850, risk: 'Medium', dailyReturn: '89%', trades: 215, minAllocation: 200 },
+  { id: 3, name: 'Marco Rossi', winRate: '92%', return: '+215%', followers: 3400, risk: 'High', dailyReturn: '215%', trades: 512, minAllocation: 700 },
+  { id: 4, name: 'Elena Petrova', winRate: '81%', return: '+67%', followers: 420, risk: 'Low', dailyReturn: '67%', trades: 189, minAllocation: 200 },
+  { id: 5, name: 'James Wilson', winRate: '77%', return: '+45%', followers: 640, risk: 'Medium', dailyReturn: '45%', trades: 156, minAllocation: 100 },
+  { id: 6, name: 'Lisa Anderson', winRate: '88%', return: '+178%', followers: 2100, risk: 'High', dailyReturn: '178%', trades: 398, minAllocation: 500 },
 ];
 
 export function CopyTradingPage() {
@@ -30,8 +30,9 @@ export function CopyTradingPage() {
   const [filterRisk, setFilterRisk] = useState<'all' | 'Low' | 'Medium' | 'High'>('all');
 
   const handleFollowTrader = (trader: any) => {
-    if (!allocateAmount || parseFloat(allocateAmount) < 100) {
-      alert('Minimum allocation is $100');
+    const minRequired = trader.minAllocation || 100;
+    if (!allocateAmount || parseFloat(allocateAmount) < minRequired) {
+      alert(`Minimum allocation for ${trader.name} is $${minRequired}`);
       return;
     }
 
@@ -66,6 +67,7 @@ export function CopyTradingPage() {
     risk: template.risk,
     dailyReturn: `${template.dailyReturn}%`,
     trades: template.trades,
+    minAllocation: 500, // Default minimum for custom templates
     isSpecial: true
   }));
 
@@ -210,6 +212,12 @@ export function CopyTradingPage() {
                   </span>
                 </div>
 
+                {/* Minimum Allocation */}
+                <div className="flex items-center justify-between text-sm bg-[#0d1117] p-2 rounded border border-[#21262d]">
+                  <span className="text-[#8b949e]">Min. Investment:</span>
+                  <span className="font-mono font-bold text-[#26a69a]">${trader.minAllocation || 100}</span>
+                </div>
+
                 {/* Action Button */}
                 {activeCopies.some(c => c.tradesId === trader.id) ? (
                   <div className="p-3 bg-[#26a69a]/10 border border-[#26a69a] rounded text-center">
@@ -236,19 +244,25 @@ export function CopyTradingPage() {
                 <div className="space-y-3">
                   <label className="block text-sm text-[#8b949e] font-bold">Allocation Amount (USD)</label>
                   <div className="space-y-2">
-                    {[100, 250, 500, 1000].map((val) => (
-                      <button
-                        key={val}
-                        onClick={() => setAllocateAmount(val.toString())}
-                        className={`w-full p-2 text-sm font-mono font-bold rounded border transition-all ${
-                          allocateAmount === val.toString()
-                            ? 'border-[#26a69a] bg-[#26a69a]/10 text-[#26a69a]'
-                            : 'border-[#21262d] bg-[#0d1117] text-white hover:border-[#8b949e]'
-                        }`}
-                      >
-                        ${val}
-                      </button>
-                    ))}
+                    {[100, 250, 500, 1000].map((val) => {
+                      const isAllowed = val >= (selectedTrader.minAllocation || 100);
+                      return (
+                        <button
+                          key={val}
+                          onClick={() => isAllowed && setAllocateAmount(val.toString())}
+                          disabled={!isAllowed}
+                          className={`w-full p-2 text-sm font-mono font-bold rounded border transition-all ${
+                            !isAllowed
+                              ? 'border-[#21262d]/50 bg-[#0d1117]/50 text-[#8b949e]/50 cursor-not-allowed'
+                              : allocateAmount === val.toString()
+                              ? 'border-[#26a69a] bg-[#26a69a]/10 text-[#26a69a]'
+                              : 'border-[#21262d] bg-[#0d1117] text-white hover:border-[#8b949e]'
+                          }`}
+                        >
+                          ${val}
+                        </button>
+                      );
+                    })}
                   </div>
                   <input
                     type="number"
@@ -256,10 +270,10 @@ export function CopyTradingPage() {
                     onChange={(e) => setAllocateAmount(e.target.value)}
                     className="w-full bg-[#0d1117] border border-[#21262d] rounded p-3 text-white font-mono text-lg focus:border-[#26a69a] focus:outline-none"
                     placeholder="Custom amount"
-                    min="100"
+                    min={selectedTrader.minAllocation || 100}
                   />
                   <p className="text-xs text-[#8b949e]">
-                    Available: {formatCurrency(account.freeMargin)} | Min: $100
+                    Available: {formatCurrency(account.freeMargin)} | Min: ${selectedTrader.minAllocation || 100}
                   </p>
                 </div>
 
