@@ -216,9 +216,9 @@ interface StoreContextType {
   // Admin Methods
   addBalance: (userId: string, amount: number) => void;
   removeBalance: (userId: string, amount: number) => void;
-  togglePageLock: (userId: string, page: string) => void;
+  togglePageLock: (userId: string, page: string) => Promise<void>;
   toggleUserLock: (userId: string) => void;
-    setUserTradeMode: (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => void;
+    setUserTradeMode: (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => Promise<void>;
   approveTransaction: (transactionId: string) => void;
   rejectTransaction: (transactionId: string) => void;
   getUserById: (userId: string) => User | undefined;
@@ -2359,29 +2359,76 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
     setTransactions((prev) => [tx, ...prev]);
   };
 
-  const togglePageLock = (userId: string, page: string) => {
-    setAllUsers((prev) =>
-      prev.map((u) => {
-        if (u.id === userId) {
-          const locked = (u.lockedPages || []).includes(page);
-          return {
-            ...u,
-            lockedPages: locked
-              ? (u.lockedPages || []).filter((p) => p !== page)
-              : [...(u.lockedPages || []), page]
-          };
-        }
-        return u;
-      })
-    );
+  const togglePageLock = async (userId: string, page: string) => {
+    try {
+      // Get current locked pages
+      const user = allUsers.find(u => u.id === userId);
+      const currentLockedPages = user?.lockedPages || [];
+      const isLocked = currentLockedPages.includes(page);
+      
+      // Determine new locked pages
+      const newLockedPages = isLocked
+        ? currentLockedPages.filter((p) => p !== page)
+        : [...currentLockedPages, page];
+
+      // Update in Supabase
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ locked_pages: newLockedPages })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('🔴 Error updating locked pages in Supabase:', error.message);
+        alert('❌ Error updating page access: ' + error.message);
+        return;
+      }
+
+      // Update local state
+      setAllUsers((prev) =>
+        prev.map((u) => {
+          if (u.id === userId) {
+            return {
+              ...u,
+              lockedPages: newLockedPages
+            };
+          }
+          return u;
+        })
+      );
+
+      console.log('✅ Page lock toggled for user', userId, '- Page:', page, '- Locked:', !isLocked);
+    } catch (err: any) {
+      console.error('🔴 Exception updating page lock:', err.message);
+      alert('❌ Error: ' + err.message);
+    }
   };
 
-    const setUserTradeMode = (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => {
-      setAllUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, tradeMode: mode } : u))
-      );
-      if (user && user.id === userId) {
-        setUser((prev) => prev ? { ...prev, tradeMode: mode } : null);
+    const setUserTradeMode = async (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => {
+      try {
+        // Update in Supabase
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ trade_mode: mode })
+          .eq('id', userId);
+
+        if (error) {
+          console.error('🔴 Error updating trade mode in Supabase:', error.message);
+          alert('❌ Error updating trade mode: ' + error.message);
+          return;
+        }
+
+        // Update local state
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === userId ? { ...u, tradeMode: mode } : u))
+        );
+        if (user && user.id === userId) {
+          setUser((prev) => prev ? { ...prev, tradeMode: mode } : null);
+        }
+
+        console.log('✅ Trade mode updated to', mode, 'for user', userId);
+      } catch (err: any) {
+        console.error('🔴 Exception updating trade mode:', err.message);
+        alert('❌ Error: ' + err.message);
       }
     };
 

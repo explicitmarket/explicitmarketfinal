@@ -157,17 +157,16 @@ export function AdminPage() {
   ];
 
 
-  const handleTogglePageLock = (userId: string, page: string) => {
-    togglePageLock(userId, page);
+  const handleTogglePageLock = async (userId: string, page: string) => {
+    await togglePageLock(userId, page);
   };
 
   const handleToggleUserLock = (userId: string) => {
     toggleUserLock(userId);
   };
 
-  const handleSetTradeMode = (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => {
-    setUserTradeMode(userId, mode);
-    alert(`✅ Trade mode set to ${mode}`);
+  const handleSetTradeMode = async (userId: string, mode: 'NORMAL' | 'PROFIT' | 'LOSS') => {
+    await setUserTradeMode(userId, mode);
   };
 
   // Dashboard Tab
@@ -352,7 +351,7 @@ export function AdminPage() {
               {AVAILABLE_PAGES.map(page => (
                 <button
                   key={page}
-                  onClick={() => handleTogglePageLock(selectedUser.id, page)}
+                  onClick={async () => await handleTogglePageLock(selectedUser.id, page)}
                   className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                     (selectedUser.lockedPages || []).includes(page)
                       ? 'bg-[#ef5350]/30 text-[#ef5350]'
@@ -379,7 +378,7 @@ export function AdminPage() {
                 {(['NORMAL', 'PROFIT', 'LOSS'] as const).map((mode) => (
                   <button
                     key={mode}
-                    onClick={() => handleSetTradeMode(selectedUser.id, mode)}
+                    onClick={async () => await handleSetTradeMode(selectedUser.id, mode)}
                     className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center ${
                       (selectedUser.tradeMode || 'NORMAL') === mode
                         ? 'bg-[#2962ff]/10 border-[#2962ff] text-white'
@@ -418,7 +417,7 @@ export function AdminPage() {
                 {AVAILABLE_PAGES.map(page => (
                   <button
                     key={page}
-                    onClick={() => handleTogglePageLock(user.id, page)}
+                    onClick={async () => await handleTogglePageLock(user.id, page)}
                     className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                       (user.lockedPages || []).includes(page)
                         ? 'bg-[#ef5350] text-white'
