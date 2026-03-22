@@ -1908,6 +1908,49 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
           console.log('ℹ️ No bot templates found');
           setBotTemplates([]);
         }
+
+        // 11. Load signal templates (admin creates, users can subscribe)
+        console.log('⚡ [LOAD] Loading signal templates');
+        let signalTemplateQuery = supabase
+          .from('signal_templates')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        // Only filter active signals for regular users
+        if (!isAdmin) {
+          signalTemplateQuery = signalTemplateQuery.eq('is_active', true);
+        }
+
+        const { data: signalTemplateData, error: signalTemplateError } = await signalTemplateQuery;
+
+        if (signalTemplateError) {
+          console.error('🔴 [LOAD] Error querying signal templates:', signalTemplateError.message);
+          console.log('ℹ️ No signal templates found or error:', signalTemplateError.message);
+          setSignalTemplates([]);
+        } else if (signalTemplateData && signalTemplateData.length > 0) {
+          console.log('✅ [LOAD] Loaded', signalTemplateData.length, 'signal templates' + (isAdmin ? ' (all for admin)' : ' (active only)'));
+          console.log('🟡 [LOAD] Signal template data from Supabase:', signalTemplateData);
+          const convertedSignalTemplates: SignalTemplate[] = signalTemplateData.map((s: any) => ({
+            id: s.id,
+            providerName: s.provider_name,
+            description: s.description,
+            symbol: s.symbol,
+            confidence: parseFloat(s.confidence),
+            followers: s.followers,
+            cost: parseFloat(s.cost),
+            winRate: parseFloat(s.win_rate),
+            trades: s.trades,
+            avgReturn: parseFloat(s.avg_return),
+            createdBy: s.created_by,
+            createdAt: new Date(s.created_at).getTime(),
+            updatedAt: new Date(s.updated_at).getTime()
+          }));
+          console.log('✅ [LOAD] Converted signal templates:', convertedSignalTemplates);
+          setSignalTemplates(convertedSignalTemplates);
+        } else {
+          console.log('ℹ️ No signal templates found');
+          setSignalTemplates([]);
+        }
       }
 
       console.log('✅ Data loading complete');
@@ -3726,41 +3769,117 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
   };
 
   // Signal Template Methods
-  const addSignalTemplate = (providerName: string, description: string, symbol: string, confidence: number, followers: number, cost: number, winRate: number, trades: number, avgReturn: number) => {
+  const addSignalTemplate = async (providerName: string, description: string, symbol: string, confidence: number, followers: number, cost: number, winRate: number, trades: number, avgReturn: number) => {
     if (!user) return;
-    const newSignal: SignalTemplate = {
-      id: generateId(),
-      providerName,
-      description,
-      symbol,
-      confidence,
-      followers,
-      cost,
-      winRate,
-      trades,
-      avgReturn,
-      createdBy: user.id,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    setSignalTemplates((prev) => [...prev, newSignal]);
-    alert('✅ Signal template created successfully');
+    try {
+      const { data, error } = await supabase
+        .from('signal_templates')
+        .insert([
+          {
+            provider_name: providerName,
+            description,
+            symbol,
+            confidence,
+            followers,
+            cost,
+            win_rate: winRate,
+            trades,
+            avg_return: avgReturn,
+            created_by: user.id,
+            is_active: true
+          }
+        ])
+        .select();
+
+      if (error) {
+        console.error('❌ Error adding signal template:', error.message);
+        alert('❌ Failed to add signal: ' + error.message);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const s = data[0];
+        const newSignal: SignalTemplate = {
+          id: s.id,
+          providerName: s.provider_name,
+          description: s.description,
+          symbol: s.symbol,
+          confidence: parseFloat(s.confidence),
+          followers: s.followers,
+          cost: parseFloat(s.cost),
+          winRate: parseFloat(s.win_rate),
+          trades: s.trades,
+          avgReturn: parseFloat(s.avg_return),
+          createdBy: s.created_by,
+          createdAt: new Date(s.created_at).getTime(),
+          updatedAt: new Date(s.updated_at).getTime()
+        };
+        setSignalTemplates((prev) => [...prev, newSignal]);
+        alert('✅ Signal template created successfully');
+      }
+    } catch (err: any) {
+      console.error('Error adding signal template:', err.message);
+      alert('❌ Error creating signal: ' + err.message);
+    }
   };
 
-  const editSignalTemplate = (signalId: string, updates: Partial<SignalTemplate>) => {
-    setSignalTemplates((prev) =>
-      prev.map((signal) =>
-        signal.id === signalId
-          ? { ...signal, ...updates, updatedAt: Date.now() }
-          : signal
-      )
-    );
-    alert('✅ Signal template updated');
+  const editSignalTemplate = async (signalId: string, updates: Partial<SignalTemplate>) => {
+    try {
+      const updateData: any = {};
+      if (updates.providerName !== undefined) updateData.provider_name = updates.providerName;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.symbol !== undefined) updateData.symbol = updates.symbol;
+      if (updates.confidence !== undefined) updateData.confidence = updates.confidence;
+      if (updates.followers !== undefined) updateData.followers = updates.followers;
+      if (updates.cost !== undefined) updateData.cost = updates.cost;
+      if (updates.winRate !== undefined) updateData.win_rate = updates.winRate;
+      if (updates.trades !== undefined) updateData.trades = updates.trades;
+      if (updates.avgReturn !== undefined) updateData.avg_return = updates.avgReturn;
+
+      const { error } = await supabase
+        .from('signal_templates')
+        .update(updateData)
+        .eq('id', signalId);
+
+      if (error) {
+        console.error('❌ Error updating signal template:', error.message);
+        alert('❌ Failed to update signal: ' + error.message);
+        return;
+      }
+
+      setSignalTemplates((prev) =>
+        prev.map((signal) =>
+          signal.id === signalId
+            ? { ...signal, ...updates, createdAt: signal.createdAt }
+            : signal
+        )
+      );
+      alert('✅ Signal template updated');
+    } catch (err: any) {
+      console.error('Error updating signal template:', err.message);
+      alert('❌ Error updating signal: ' + err.message);
+    }
   };
 
-  const deleteSignalTemplate = (signalId: string) => {
-    setSignalTemplates((prev) => prev.filter((signal) => signal.id !== signalId));
-    alert('✅ Signal template deleted');
+  const deleteSignalTemplate = async (signalId: string) => {
+    try {
+      const { error } = await supabase
+        .from('signal_templates')
+        .delete()
+        .eq('id', signalId);
+
+      if (error) {
+        console.error('❌ Error deleting signal template:', error.message);
+        alert('❌ Failed to delete signal: ' + error.message);
+        return;
+      }
+
+      setSignalTemplates((prev) => prev.filter((signal) => signal.id !== signalId));
+      alert('✅ Signal template deleted');
+    } catch (err: any) {
+      console.error('Error deleting signal template:', err.message);
+      alert('❌ Error deleting signal: ' + err.message);
+    }
   };
 
   // Copy Trade Template Methods

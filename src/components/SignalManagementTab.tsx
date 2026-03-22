@@ -35,7 +35,7 @@ export function SignalManagementTabComponent({
     }));
   };
 
-  const handleAddSignal = (e?: any) => {
+  const handleAddSignal = async (e?: any) => {
     if (e?.preventDefault) {
       e.preventDefault();
     }
@@ -73,7 +73,7 @@ export function SignalManagementTabComponent({
     }
 
     if (editingSignalId) {
-      editSignalTemplate(editingSignalId, {
+      await editSignalTemplate(editingSignalId, {
         providerName: signalForm.providerName,
         description: signalForm.description,
         symbol: signalForm.symbol,
@@ -85,9 +85,8 @@ export function SignalManagementTabComponent({
         avgReturn: parseFloat(signalForm.avgReturn)
       });
       setEditingSignalId(null);
-      alert('✅ Signal template updated successfully');
     } else {
-      addSignalTemplate(
+      await addSignalTemplate(
         signalForm.providerName,
         signalForm.description,
         signalForm.symbol,
@@ -130,6 +129,12 @@ export function SignalManagementTabComponent({
       avgReturn: signal.avgReturn.toString()
     });
     setEditingSignalId(signal.id);
+  };
+
+  const handleDeleteSignal = async (signalId: string) => {
+    if (confirm('Are you sure you want to delete this signal template?')) {
+      await deleteSignalTemplate(signalId);
+    }
   };
 
   return (
@@ -333,11 +338,7 @@ export function SignalManagementTabComponent({
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm('Are you sure you want to delete this signal template?')) {
-                          deleteSignalTemplate(signal.id);
-                        }
-                      }}
+                      onClick={() => handleDeleteSignal(signal.id)}
                       className="p-2 bg-[#ef5350]/20 text-[#ef5350] hover:bg-[#ef5350]/30 rounded-lg transition-colors"
                       title="Delete signal"
                     >
