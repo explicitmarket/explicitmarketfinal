@@ -21,6 +21,8 @@ import { Contact } from './pages/Contact';
 import { TermsAndConditions } from './pages/TermsAndConditions';
 import { HedgeFunds } from './pages/HedgeFunds';
 import { WhatIsEaTrading } from './pages/WhatIsEaTrading';
+import { Security } from './pages/Security';
+import { AboutTradeCopyings } from './pages/AboutTradeCopyings';
 import { Layout } from './components/Layout';
 import { LockedPageMessage } from './components/LockedPageMessage';
 function AppContent() {
@@ -51,6 +53,8 @@ function AppContent() {
   if (pathname === '/terms') return <TermsAndConditions />;
   if (pathname === '/hedge-funds') return <HedgeFunds />;
   if (pathname === '/what-is-ea-trading') return <WhatIsEaTrading />;
+  if (pathname === '/security') return <Security />;
+  if (pathname === '/about-trade-copyings') return <AboutTradeCopyings />;
 
   // Not authenticated - show landing, login, or signup
   if (!isAuthenticated) {
