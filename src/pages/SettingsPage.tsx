@@ -100,7 +100,7 @@ export function SettingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-10 bg-white dark:bg-gray-950 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Account Settings</h1>
+      <h1 className="text-2xl font-light tracking-tight text-gray-900 dark:text-white mb-6">Account Settings</h1>
 
       {successMessage && (
         <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-400">

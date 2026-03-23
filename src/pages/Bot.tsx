@@ -198,9 +198,9 @@ export function BotPage() {
         <div className="relative z-10 text-center space-y-4">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Bot className="h-6 w-6 text-[#2962ff]" />
-            <span className="text-[#2962ff] font-bold text-sm">AI-Powered Trading</span>
+            <span className="text-[#2962ff] font-light tracking-widest text-sm">AI-Powered Trading</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Automate Your Trading Strategy</h1>
+          <h1 className="text-4xl font-light tracking-tight text-gray-900 dark:text-white">Automate Your Trading Strategy</h1>
           <p className="text-gray-600 dark:text-[#8b949e] max-w-2xl mx-auto">
             Deploy professional trading algorithms to execute trades 24/7 with precision
           </p>
@@ -251,7 +251,7 @@ export function BotPage() {
               <Bot className="h-6 w-6 text-[#2962ff]" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">My Active Bot</h2>
+              <h2 className="text-2xl font-light tracking-tight text-white">My Active Bot</h2>
               <p className="text-sm text-[#8b949e]">
                 {effectiveBotActive ? 'Running: Scalper Pro' : 'No bot currently running'}
               </p>
@@ -307,7 +307,7 @@ export function BotPage() {
       {purchasedBots.length > 0 && (
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-white mb-2">My Purchased Bots</h3>
+            <h3 className="text-2xl font-light tracking-tight text-white mb-2">My Purchased Bots</h3>
             <p className="text-[#8b949e]">Bots you own with real-time performance monitoring</p>
           </div>
 
@@ -328,7 +328,7 @@ export function BotPage() {
                   {/* Header */}
                   <div className="p-6 space-y-3 border-b border-[#21262d]">
                     <div className="space-y-1.5">
-                      <h4 className="text-xl font-bold text-white">{purchase.botName}</h4>
+                      <h4 className="text-xl font-light tracking-tight text-white">{purchase.botName}</h4>
                       <span
                         className={`inline-flex text-xs font-bold px-3 py-1.5 rounded-full border ${
                           purchase.status === 'ACTIVE'
@@ -436,7 +436,7 @@ export function BotPage() {
       {/* Marketplace Section */}
       <div className="space-y-6">
         <div>
-          <h3 className="text-2xl font-bold text-white mb-2">Available Bots</h3>
+          <h3 className="text-2xl font-light tracking-tight text-white mb-2">Available Bots</h3>
           <p className="text-[#8b949e]">Choose from our collection of high-performance trading algorithms</p>
         </div>
 
@@ -467,7 +467,7 @@ export function BotPage() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <h4 className="text-xl font-bold text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all">
+                      <h4 className="text-xl font-light tracking-tight text-white mb-1 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-cyan-400 group-hover:bg-clip-text transition-all">
                         {bot.name}
                       </h4>
                       <p className="text-sm text-[#8b949e] line-clamp-2">{bot.description}</p>

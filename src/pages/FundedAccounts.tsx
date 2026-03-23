@@ -159,9 +159,9 @@ export function FundedAccountsPage() {
         <div className="relative z-10 space-y-4 max-w-2xl">
           <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-[#2962ff]" />
-            <span className="text-[#2962ff] font-bold text-sm">FUNDED TRADING ACCOUNTS</span>
+            <span className="text-[#2962ff] font-light tracking-widest text-sm">FUNDED TRADING ACCOUNTS</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">Trade with Our Capital</h1>
+          <h1 className="text-4xl md:text-5xl font-light tracking-tight text-gray-900 dark:text-white">Trade with Our Capital</h1>
           <p className="text-gray-600 dark:text-[#8b949e] text-lg">
             Get access to real trading capital and start earning profits. Pass our simple evaluation and get funded with up to $500,000.
           </p>
@@ -194,7 +194,7 @@ export function FundedAccountsPage() {
 
       {/* How It Works */}
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">How It Works</h2>
+        <h2 className="text-3xl font-light tracking-tight text-gray-900 dark:text-white">How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[
             { num: 1, title: 'Choose a Plan', desc: 'Select the funded account that suits your trading style' },
@@ -207,7 +207,7 @@ export function FundedAccountsPage() {
                 <div className="w-10 h-10 bg-[#2962ff] rounded-full flex items-center justify-center font-bold text-white">
                   {step.num}
                 </div>
-                <h3 className="font-bold text-white">{step.title}</h3>
+                <h3 className="font-light tracking-tight text-white">{step.title}</h3>
                 <p className="text-sm text-[#8b949e]">{step.desc}</p>
               </div>
               {idx < 3 && <ArrowRight className="absolute -right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#21262d] hidden md:block" />}
@@ -219,7 +219,7 @@ export function FundedAccountsPage() {
       {/* User Funded Account Status */}
       {user && (
         <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">My Funded Account Requests</h2>
+          <h2 className="text-2xl font-light tracking-tight text-white mb-4">My Funded Account Requests</h2>
           {userFunded.length > 0 ? (
             <div className="space-y-4">
               {userFunded.map((acc) => (
@@ -244,7 +244,7 @@ export function FundedAccountsPage() {
       {/* Pricing Plans */}
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-white">Funding Plans</h2>
+          <h2 className="text-3xl font-light tracking-tight text-white">Funding Plans</h2>
           <p className="text-[#8b949e] max-w-2xl mx-auto">Choose the plan that fits your trading strategy and experience level</p>
         </div>
 
@@ -268,7 +268,7 @@ export function FundedAccountsPage() {
               <div className="p-6 space-y-6 flex flex-col h-full">
                 {/* Header */}
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-1">{plan.name}</h3>
+                  <h3 className="text-2xl font-light tracking-tight text-white mb-1">{plan.name}</h3>
                   {plan.price === 0 ? (
                     <p className="text-[#26a69a] font-bold text-lg">Free Application</p>
                   ) : (

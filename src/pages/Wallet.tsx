@@ -242,7 +242,7 @@ export function WalletPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+          <h1 className="text-3xl font-light tracking-tight text-gray-900 dark:text-white flex items-center gap-3">
             <Wallet className="h-8 w-8 text-[#26a69a]" />
             Wallet & Funds
           </h1>
@@ -339,7 +339,7 @@ export function WalletPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Statistics */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Account Statistics</h3>
+              <h3 className="text-lg font-light tracking-tight text-gray-900 dark:text-white">Account Statistics</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-gray-100 dark:bg-[#161b22] border border-gray-300 dark:border-[#21262d] rounded p-4">
                   <p className="text-sm text-gray-600 dark:text-[#8b949e] mb-2">Total Deposited</p>
@@ -376,7 +376,7 @@ export function WalletPage() {
 
             {/* Quick Actions */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white">Quick Actions</h3>
+              <h3 className="text-lg font-light tracking-tight text-white">Quick Actions</h3>
               <div className="space-y-3">
                 <button
                   onClick={() => setActiveTab('deposit')}

@@ -143,9 +143,9 @@ export function SignalsPage() {
         <div className="relative z-10 text-center space-y-4">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Zap className="h-6 w-6 text-[#2962ff]" />
-            <span className="text-[#2962ff] font-bold text-sm">Premium Signal Marketplace</span>
+            <span className="text-[#2962ff] font-light tracking-widest text-sm">Premium Signal Marketplace</span>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Trade Smarter with Expert Signals</h1>
+          <h1 className="text-4xl font-light tracking-tight text-gray-900 dark:text-white">Trade Smarter with Expert Signals</h1>
           <p className="text-gray-600 dark:text-[#8b949e] max-w-2xl mx-auto">
             Copy verified signals from top-performing traders and execute trades with confidence
           </p>
@@ -190,7 +190,7 @@ export function SignalsPage() {
 
       {/* Filters */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-gray-600 dark:text-[#8b949e] uppercase">Filter Signals</h3>
+        <h3 className="text-sm font-light tracking-widest text-gray-600 dark:text-[#8b949e] uppercase">Filter Signals</h3>
         <div className="flex flex-wrap gap-2">
           {['All', 'Forex', 'Crypto', 'Commodities', 'Premium'].map((filter) => (
             <button
@@ -216,7 +216,7 @@ export function SignalsPage() {
               <TrendingUp className="h-6 w-6 text-[#26a69a]" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white">Recent Performance</h3>
+              <h3 className="font-light tracking-tight text-gray-900 dark:text-white">Recent Performance</h3>
               <p className="text-xs text-gray-600 dark:text-[#8b949e]">Last 24 hours</p>
             </div>
           </div>
@@ -237,7 +237,7 @@ export function SignalsPage() {
               <Zap className="h-6 w-6 text-[#2962ff]" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white">Profit Potential</h3>
+              <h3 className="font-light tracking-tight text-gray-900 dark:text-white">Profit Potential</h3>
               <p className="text-xs text-gray-600 dark:text-[#8b949e]">Average per trade</p>
             </div>
           </div>
@@ -252,7 +252,7 @@ export function SignalsPage() {
       {purchasedSignals.length > 0 && (
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">My Signal Subscriptions</h3>
+            <h3 className="text-2xl font-light tracking-tight text-gray-900 dark:text-white mb-2">My Signal Subscriptions</h3>
             <p className="text-gray-600 dark:text-[#8b949e]">Active signals with real-time trading performance</p>
           </div>
 
@@ -273,7 +273,7 @@ export function SignalsPage() {
                   {/* Header */}
                   <div className="p-6 space-y-3 border-b border-gray-300 dark:border-[#21262d]">
                     <div className="space-y-1.5">
-                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">{signal.providerName}</h4>
+                      <h4 className="text-xl font-light tracking-tight text-gray-900 dark:text-white">{signal.providerName}</h4>
                       <span
                         className={`inline-flex text-xs font-bold px-3 py-1.5 rounded-full border ${
                           signal.status === 'ACTIVE'
@@ -363,7 +363,7 @@ export function SignalsPage() {
       {customTraders.length > 0 && (
         <div className="space-y-6">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Special Signals</h3>
+            <h3 className="text-lg font-light tracking-tight text-gray-900 dark:text-white">Special Signals</h3>
             <span className="px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded text-xs font-bold">SPECIAL</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

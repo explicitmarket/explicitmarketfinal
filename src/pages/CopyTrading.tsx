@@ -84,7 +84,7 @@ export function CopyTradingPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+          <h1 className="text-3xl font-light tracking-tight text-gray-900 dark:text-white flex items-center gap-3">
             <Copy className="h-8 w-8 text-[#26a69a]" />
             Copy Trading
           </h1>
@@ -162,7 +162,7 @@ export function CopyTradingPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-white">{trader.name}</h3>
+                      <h3 className="font-light tracking-tight text-white">{trader.name}</h3>
                       {(trader as any).isSpecial && (
                         <span className="text-xs px-2 py-0.5 bg-cyan-500/20 text-cyan-400 rounded font-bold">
                           SPECIAL
@@ -239,7 +239,7 @@ export function CopyTradingPage() {
           {selectedTrader && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
               <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-8 max-w-md w-full space-y-6">
-                <h2 className="text-2xl font-bold text-white">Copy {selectedTrader.name}</h2>
+                <h2 className="text-2xl font-light tracking-tight text-white">Copy {selectedTrader.name}</h2>
 
                 <div className="space-y-3">
                   <label className="block text-sm text-[#8b949e] font-bold">Allocation Amount (USD)</label>
