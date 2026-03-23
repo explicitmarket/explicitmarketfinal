@@ -11,6 +11,7 @@ import {
   Radio,
   Calendar,
   Filter,
+  Flame,
 } from 'lucide-react';
 
 export function HistoryPage() {
@@ -31,10 +32,14 @@ export function HistoryPage() {
     console.log('   Purchased Bots:', purchasedBots?.length || 0);
     console.log('   Purchased Signals:', purchasedSignals?.length || 0);
     console.log('   Purchased Copy Trades:', purchasedCopyTrades?.length || 0);
+    console.log('   Recent Trades:', recentTrades?.length || 0);
     if (purchasedBots && purchasedBots.length > 0) {
       console.log('   Bot Details:', purchasedBots);
     }
-  }, [user, purchasedBots, purchasedSignals, purchasedCopyTrades]);
+    if (recentTrades && recentTrades.length > 0) {
+      console.log('   Recent Trades Details:', recentTrades);
+    }
+  }, [user, purchasedBots, purchasedSignals, purchasedCopyTrades, recentTrades]);
 
   const [activeTab, setActiveTab] = useState<'all' | 'transactions' | 'copy-trades' | 'bots' | 'signals' | 'funded-accounts' | 'recent-trades'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'closed' | 'completed' | 'pending' | 'failed'>('all');
@@ -124,6 +129,22 @@ export function HistoryPage() {
     color: 'text-[#2962ff]',
   }));
 
+  // Convert recent trades to unified format
+  const recentTradeHistory = (recentTrades || []).map((trade) => ({
+    id: trade.id,
+    type: 'recent-trade',
+    title: `${trade.type} ${trade.symbol}`,
+    amount: trade.profit,
+    symbol: trade.symbol,
+    volume: trade.volume,
+    entryPrice: trade.entryPrice,
+    closePrice: trade.closePrice,
+    date: trade.closedAt || trade.openedAt,
+    status: trade.status,
+    icon: Flame,
+    color: trade.profit >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]',
+  }));
+
   // Combine all histories
   const allHistories = [
     ...transactionHistory,
@@ -131,6 +152,7 @@ export function HistoryPage() {
     ...botHistory,
     ...signalHistory,
     ...fundedAccountHistory,
+    ...recentTradeHistory,
   ];
 
   // Filter based on tab and search
@@ -140,9 +162,9 @@ export function HistoryPage() {
 
     // Filter by status
     if (filterStatus !== 'all') {
-      if (filterStatus === 'active' && item.status !== 'ACTIVE') return false;
+      if (filterStatus === 'active' && item.status !== 'ACTIVE' && item.status !== 'OPEN') return false;
       if (filterStatus === 'closed' && item.status !== 'CLOSED') return false;
-      if (filterStatus === 'completed' && item.status !== 'COMPLETED') return false;
+      if (filterStatus === 'completed' && item.status !== 'COMPLETED' && item.status !== 'CLOSED') return false;
       if (filterStatus === 'pending' && item.status !== 'PENDING') return false;
       if (filterStatus === 'failed' && item.status !== 'REJECTED') return false;
     }
@@ -358,6 +380,11 @@ export function HistoryPage() {
                       {item.type === 'funded-account' && (
                         <span className="text-[#8b949e] text-xs">
                           ${item.profitTarget?.toFixed(0)}
+                        </span>
+                      )}
+                      {item.type === 'recent-trade' && (
+                        <span className="text-[#8b949e] text-xs">
+                          {item.volume} @ ${item.entryPrice?.toFixed(2)}
                         </span>
                       )}
                     </td>

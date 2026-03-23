@@ -3489,7 +3489,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
       status: 'OPEN',
       date: Date.now()
     };
-    syncTransaction(tx);
+    setTransactions((prev) => [tx, ...prev]);
   };
   const closeTrade = (tradeId: string) => {
     if (!user) return;
@@ -3514,6 +3514,63 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
     );
     // Sync balance update to Supabase
     syncUserBalance(user.id, newBalance);
+
+    // IMPORTANT: Persist closed trade to recent_trades table in Supabase for cross-device sync
+    const recentTrade = {
+      id: generateId(),
+      userId: user.id,
+      symbol: trade.symbol,
+      type: trade.type as 'BUY' | 'SELL',
+      volume: trade.lots,
+      entryPrice: trade.entryPrice,
+      closePrice: trade.currentPrice || trade.entryPrice,
+      profit: trade.profit,
+      openedAt: trade.openTime,
+      closedAt: Date.now(),
+      status: 'CLOSED' as const
+    };
+
+    // Add to recent trades local state FIRST
+    setRecentTrades((prev) => [recentTrade, ...prev]);
+
+    // Sync closed trade to Supabase - with retry logic
+    const insertTradeToSupabase = async () => {
+      try {
+        const { data, error } = await supabase.from('recent_trades').insert({
+          id: recentTrade.id,
+          user_id: recentTrade.userId,
+          symbol: recentTrade.symbol,
+          type: recentTrade.type,
+          volume: recentTrade.volume,
+          entry_price: recentTrade.entryPrice,
+          close_price: recentTrade.closePrice,
+          profit: recentTrade.profit,
+          opened_at: new Date(recentTrade.openedAt).toISOString(),
+          closed_at: new Date(recentTrade.closedAt).toISOString(),
+          status: 'CLOSED'
+        });
+
+        if (error) {
+          console.error('❌ Error syncing closed trade to Supabase:', {
+            message: error.message,
+            code: error.code,
+            hint: error.hint,
+            details: error.details,
+            tradeData: { symbol: trade.symbol, profit: trade.profit }
+          });
+          
+          // Log full error for debugging
+          console.warn('Trade data that failed to sync:', recentTrade);
+        } else {
+          console.log('✅ Closed trade synced to Supabase:', trade.symbol, 'Profit: $' + trade.profit.toFixed(2), 'Trade ID:', recentTrade.id);
+        }
+      } catch (err) {
+        console.error('❌ Exception when syncing trade:', err);
+      }
+    };
+
+    // Execute async sync without blocking UI
+    insertTradeToSupabase();
   };
 
   // Record a closed trade to recent trades history (persisted to Supabase)
