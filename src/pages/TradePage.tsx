@@ -6,6 +6,8 @@ import { TradeList } from '../components/trading/TradeList';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../lib/store';
 import { cn } from '../lib/utils';
+import { Moon, Sun } from 'lucide-react';
+
 export function TradePage() {
   const { assets } = useStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -14,10 +16,28 @@ export function TradePage() {
   const [loadingText, setLoadingText] = useState(
     'Connecting to trading server...'
   );
+  const [isDark, setIsDark] = useState(true);
+  
   // Mobile Tab State
   const [mobileTab, setMobileTab] = useState<'order' | 'market' | 'trades'>(
     'order'
   );
+
+  useEffect(() => {
+    const stored = localStorage.getItem('theme-mode');
+    if (stored) setIsDark(stored === 'dark');
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  const bgClass = isDark ? 'bg-black text-white' : 'bg-white text-black';
+  const cardBgClass = isDark
+    ? 'bg-slate-900/40 border border-slate-800/50 backdrop-blur-md'
+    : 'bg-slate-50/40 border border-slate-200/50 backdrop-blur-md';
+  const textMutedClass = isDark ? 'text-slate-500' : 'text-slate-600';
+  const dividerClass = isDark ? 'border-slate-800/30' : 'border-slate-200/30';
   useEffect(() => {
     const statusMessages = [
     'Connecting to trading server...',
@@ -57,161 +77,219 @@ export function TradePage() {
       clearTimeout(completeTimer);
     };
   }, []);
+
   return (
-    <div className="h-screen w-full bg-white dark:bg-[#0d1117] overflow-hidden flex flex-col relative">
+    <div className={`${bgClass} h-screen w-full overflow-hidden flex flex-col relative transition-colors duration-500`}>
+      <style>{`
+        @keyframes glow {
+          0%, 100% { text-shadow: 0 0 10px rgba(59,130,246,0.4), 0 0 20px rgba(59,130,246,0.2); }
+          50% { text-shadow: 0 0 20px rgba(59,130,246,0.7), 0 0 40px rgba(59,130,246,0.5); }
+        }
+        .glow-text { animation: glow 3s ease-in-out infinite; }
+      `}</style>
+
       <AnimatePresence>
         {isLoading &&
         <motion.div
-          initial={{
-            opacity: 1
-          }}
-          exit={{
-            opacity: 0
-          }}
-          transition={{
-            duration: 0.5
-          }}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-[#0d1117] text-gray-900 dark:text-white">
-
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className={`absolute inset-0 z-50 flex flex-col items-center justify-center ${isDark ? 'bg-black' : 'bg-white'} ${isDark ? 'text-white' : 'text-black'}`}>
+          
             <div className="w-full max-w-md px-6 text-center">
               <motion.h1
-              initial={{
-                opacity: 0,
-                y: 20
-              }}
-              animate={{
-                opacity: 1,
-                y: 0
-              }}
-              className="text-3xl font-bold text-gray-900 dark:text-white mb-8 tracking-tight">
-
-                ExplicitMarket <span className="text-[#2962ff]">Terminal</span>
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-4xl font-light tracking-tight mb-8 glow-text">
+                ExplicitMarket <span className={isDark ? 'text-blue-400' : 'text-blue-600'}>Terminal</span>
               </motion.h1>
 
-              <div className="w-full h-1 bg-gray-300 dark:bg-[#21262d] overflow-hidden mb-4">
+              <div className={`w-full h-1 ${isDark ? 'bg-slate-800/50' : 'bg-slate-200/50'} overflow-hidden mb-6 rounded-full`}>
                 <motion.div
-                className="h-full bg-[#2962ff]"
-                initial={{
-                  width: '0%'
-                }}
-                animate={{
-                  width: `${loadingProgress}%`
-                }}
-                transition={{
-                  ease: 'linear'
-                }} />
-
+                  className={`h-full ${isDark ? 'bg-gradient-to-r from-blue-500 to-emerald-500' : 'bg-gradient-to-r from-blue-600 to-emerald-600'}`}
+                  initial={{ width: '0%' }}
+                  animate={{ width: `${loadingProgress}%` }}
+                  transition={{ ease: 'linear' }}
+                />
               </div>
 
-              <div className="flex justify-between items-center text-xs font-mono text-gray-600 dark:text-[#8b949e]">
+              <div className="flex justify-between items-center text-xs font-light">
                 <motion.span
-                key={loadingText}
-                initial={{
-                  opacity: 0
-                }}
-                animate={{
-                  opacity: 1
-                }}
-                className="truncate">
-
+                  key={loadingText}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`truncate ${textMutedClass}`}>
                   {loadingText}
                 </motion.span>
-                <span>{loadingProgress}%</span>
+                <span className={textMutedClass}>{loadingProgress}%</span>
               </div>
             </div>
           </motion.div>
         }
       </AnimatePresence>
 
+      {/* Header with Theme Toggle */}
+      <motion.div 
+        className={`sticky top-0 z-40 backdrop-blur-sm ${isDark ? 'bg-black/80' : 'bg-white/80'} border-b ${dividerClass} px-4 md:px-6 py-4 flex items-center justify-between transition-all duration-300`}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div>
+          <h1 className="text-lg md:text-xl font-light tracking-tight">Trading Terminal</h1>
+          <p className={`text-xs font-light ${textMutedClass}`}>Real-time forex trading</p>
+        </div>
+        <motion.button
+          onClick={() => setIsDark(!isDark)}
+          className={`p-2 transition-all ${isDark ? 'text-white/60 hover:text-white' : 'text-black/60 hover:text-black'}`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </motion.button>
+      </motion.div>
+
       {/* Mobile Symbol Selector */}
-      <div className="md:hidden h-14 bg-gray-100 dark:bg-[#161b22] border-b border-gray-300 dark:border-[#21262d] flex items-center overflow-x-auto no-scrollbar px-2 space-x-2 flex-shrink-0">
+      <motion.div 
+        className={`md:hidden h-14 ${cardBgClass} flex items-center overflow-x-auto no-scrollbar px-2 space-x-2 flex-shrink-0`}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
         {assets.map((asset) =>
-        <button
+        <motion.button
           key={asset.symbol}
           onClick={() => setSelectedSymbol(asset.symbol)}
           className={cn(
-            'px-3 py-2 rounded text-xs font-bold whitespace-nowrap transition-colors min-h-[44px] flex items-center',
+            'px-3 py-2 rounded text-xs font-light whitespace-nowrap transition-all min-h-[44px] flex items-center',
             selectedSymbol === asset.symbol ?
-            'bg-[#2962ff] text-white' :
-            'bg-white dark:bg-[#0d1117] text-gray-600 dark:text-[#8b949e] border border-gray-300 dark:border-[#21262d]'
-          )}>
-
-            {asset.symbol}
-          </button>
+            (`${isDark ? 'bg-blue-500/30 border-blue-500/50' : 'bg-blue-100/30 border-blue-400/50'} border`) :
+            (`${cardBgClass}`)
+          )}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {asset.symbol}
+        </motion.button>
         )}
-      </div>
+      </motion.div>
 
-      {/* Main Layout - MT4 Style Grid */}
+      {/* Main Layout - Trading Grid */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Left: Market Overview (Desktop Only) */}
-        <div className="hidden md:block w-[300px] flex-shrink-0 border-r border-gray-300 dark:border-[#21262d] overflow-y-auto p-4 bg-white dark:bg-[#0d1117]">
+        <motion.div 
+          className={`hidden md:flex md:flex-col w-[300px] flex-shrink-0 ${dividerClass} border-r overflow-y-auto p-4`}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+        >
+          <h3 className={`text-xs font-light tracking-widest opacity-60 mb-4 uppercase`}>Market</h3>
           <ForexListWidget />
-        </div>
+        </motion.div>
 
-        {/* Center: Chart (Always visible, but flexible height on mobile) */}
-        <div className="flex-shrink-0 h-48 md:h-auto md:flex-1 min-w-0 border-b md:border-b-0 border-gray-300 dark:border-[#21262d]">
+        {/* Center: Chart */}
+        <motion.div 
+          className={`flex-shrink-0 h-48 md:h-auto md:flex-1 min-w-0 ${dividerClass} border-b md:border-b-0 md:border-r`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
           <Chart symbol={selectedSymbol} />
-        </div>
+        </motion.div>
 
         {/* Mobile Tab Bar */}
-        <div className="md:hidden flex bg-gray-100 dark:bg-[#161b22] border-b border-gray-300 dark:border-[#21262d] flex-shrink-0">
+        <motion.div 
+          className={`md:hidden flex ${isDark ? 'bg-slate-900/40 border-t border-slate-800/50' : 'bg-slate-50/40 border-t border-slate-200/50'} flex-shrink-0`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+        >
           {['order', 'market', 'trades'].map((tab) =>
-          <button
+          <motion.button
             key={tab}
             onClick={() => setMobileTab(tab as any)}
             className={cn(
-              'flex-1 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-colors min-h-[44px] flex items-center justify-center',
+              'flex-1 py-3 text-xs font-light uppercase tracking-wider border-b-2 transition-all min-h-[44px] flex items-center justify-center',
               mobileTab === tab ?
-              'border-[#2962ff] text-white dark:bg-[#1c2128] bg-[#e0f2ff]' :
-              'border-transparent text-gray-600 dark:text-[#8b949e]'
-            )}>
-
-              {tab}
-            </button>
+              (`border-blue-500 ${isDark ? 'text-blue-400 bg-slate-900/60' : 'text-blue-600 bg-slate-100/60'}`) :
+              (`border-transparent ${textMutedClass}`)
+            )}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {tab}
+          </motion.button>
           )}
-        </div>
+        </motion.div>
 
-        {/* Mobile Content Area (Switches based on tab) */}
-        <div className="md:hidden flex-1 overflow-hidden flexible">
-          <div
-            className={cn(
-              'h-full overflow-y-auto',
-              mobileTab === 'order' ? 'block' : 'hidden'
-            )}>
-
-            <OrderPanel symbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />
+        {/* Mobile Content Area */}
+        <AnimatePresence mode="wait">
+          <div className="md:hidden flex-1 overflow-hidden">
+            {mobileTab === 'order' && (
+              <motion.div
+                key="order"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="h-full overflow-y-auto"
+              >
+                <OrderPanel symbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />
+              </motion.div>
+            )}
+            {mobileTab === 'market' && (
+              <motion.div
+                key="market"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="h-full overflow-y-auto"
+              >
+                <div className="p-4">
+                  <ForexListWidget />
+                </div>
+              </motion.div>
+            )}
+            {mobileTab === 'trades' && (
+              <motion.div
+                key="trades"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="h-full overflow-y-auto"
+              >
+                <TradeList />
+              </motion.div>
+            )}
           </div>
-          <div
-            className={cn(
-              'h-full overflow-y-auto',
-              mobileTab === 'market' ? 'block' : 'hidden'
-            )}>
-
-            <div className="p-4">
-              <ForexListWidget />
-            </div>
-
-          </div>
-          <div
-            className={cn(
-              'h-full overflow-y-auto',
-              mobileTab === 'trades' ? 'block' : 'hidden'
-            )}>
-
-            <TradeList />
-          </div>
-        </div>
+        </AnimatePresence>
 
         {/* Right: Order Panel (Desktop Only) */}
-        <div className="hidden md:block w-[320px] flex-shrink-0 border-l border-gray-300 dark:border-[#21262d]">
+        <motion.div 
+          className={`hidden md:block w-[320px] flex-shrink-0 ${dividerClass} border-l overflow-y-auto`}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+        >
           <OrderPanel symbol={selectedSymbol} onSymbolChange={setSelectedSymbol} />
-        </div>
+        </motion.div>
       </div>
 
       {/* Bottom: Trade List (Desktop Only) */}
-      <div className="hidden md:block h-[250px] flex-shrink-0 border-t border-gray-300 dark:border-[#21262d]">
+      <motion.div 
+        className={`hidden md:block h-[250px] flex-shrink-0 ${dividerClass} border-t overflow-y-auto`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <div className={`px-4 py-3 ${dividerClass} border-b text-sm font-light`}>
+          Open Positions
+        </div>
         <TradeList />
-      </div>
-    </div>);
-
+      </motion.div>
+    </div>
+  );
 }
