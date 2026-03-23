@@ -913,7 +913,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
   // Sync signal earnings to Supabase (debounced every 10 seconds)
   useEffect(() => {
     const syncInterval = setInterval(async () => {
-      if (!user) return; // Only sync if user is logged in
+      if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
       
       for (const signal of purchasedSignals) {
         if (signal.status === 'ACTIVE') {
@@ -943,7 +943,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
   // Sync copy trade profit to Supabase (debounced every 10 seconds)
   useEffect(() => {
     const syncInterval = setInterval(async () => {
-      if (!user) return; // Only sync if user is logged in
+      if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
       
       for (const copyTrade of purchasedCopyTrades) {
         if (copyTrade.status === 'ACTIVE') {
@@ -952,7 +952,6 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
             .from('user_copy_trades')
             .update({
               profit: copyTrade.profit,
-              copied_trades: copyTrade.copiedTrades,
               updated_at: new Date().toISOString()
             })
             .eq('id', copyTrade.id)
@@ -981,7 +980,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
 
   // Subscribe to user_bots changes for real-time sync
   useEffect(() => {
-    if (!user) return;
+    if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
 
     const botsSubscription = supabase
       .channel('user_bots_changes')
@@ -1049,7 +1048,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
 
   // Subscribe to user_signals changes for real-time sync
   useEffect(() => {
-    if (!user) return;
+    if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
 
     const signalsSubscription = supabase
       .channel('user_signals_changes')
@@ -1264,7 +1263,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
 
   // Subscribe to user_balances changes for real-time balance sync
   useEffect(() => {
-    if (!user) return;
+    if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
 
     const balanceSubscription = supabase
       .channel('user_balances_changes')
@@ -1751,7 +1750,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
             traderName: ct.trader_name,
             allocation: ct.allocation,
             status: ct.status,
-            copiedTrades: ct.copied_trades || 0,
+            copiedTrades: 0, // No longer tracked in DB
             profit: ct.profit || 0,
             startDate: new Date(ct.created_at).getTime(),
             endDate: ct.end_date ? new Date(ct.end_date).getTime() : undefined,
@@ -2844,6 +2843,27 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
     }
   };
 
+  const syncTransaction = async (tx: Transaction) => {
+    // Sync transaction to Supabase
+    const { error } = await supabase
+      .from('transactions')
+      .insert({
+        id: tx.id,
+        user_id: tx.userId,
+        transaction_type: tx.type,
+        amount: tx.amount,
+        method: tx.method,
+        status: tx.status,
+        created_at: new Date(tx.date).toISOString()
+      });
+
+    if (error) {
+      console.error(`❌ Error syncing ${tx.type} to Supabase:`, error.message);
+    } else {
+      console.log(`✅ ${tx.type} synced to Supabase`);
+    }
+  };
+
   // Bot Purchase Methods
   const purchaseBot = async (botId: string, botName: string, price: number, performance: number) => {
     if (!user || user.balance === undefined || user.balance < price) {
@@ -3575,7 +3595,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
 
   // Record a closed trade to recent trades history (persisted to Supabase)
   const recordTrade = (symbol: string, type: 'BUY' | 'SELL', volume: number, entryPrice: number, closePrice: number) => {
-    if (!user) return;
+    if (!user || user.id === 'admin-1') return; // Skip admin user (admin-1 is not a valid UUID)
     
     const profit = (type === 'BUY' ? closePrice - entryPrice : entryPrice - closePrice) * volume;
     const newTrade = {
@@ -4771,16 +4791,13 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
     supabase.from('user_copy_trades').insert({
       id: newCopy.id,
       user_id: newCopy.userId,
-      trades_id: newCopy.tradesId,
       trader_name: newCopy.traderName,
       allocation: newCopy.allocation,
       status: 'ACTIVE',
-      copied_trades: 0,
       profit: 0,
       duration_value: durationValue,
       duration_type: durationType,
       win_rate: '0%',
-      risk: newCopy.risk,
       performance: newCopy.performance,
       trader_return: traderReturn
     }).then(({error}) => {

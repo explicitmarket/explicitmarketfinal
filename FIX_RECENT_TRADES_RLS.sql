@@ -1,6 +1,7 @@
 -- COMPLETE FIX: Drop and recreate recent_trades table with correct schema
--- Problem: Table was missing 'close_price' column causing 400 Bad Request
+-- Problem: Table was missing 'close_price' column and user_id was wrong type (UUID vs TEXT)
 -- Solution: Drop old table and create with correct columns
+-- user_id must be TEXT not UUID because app uses custom string user IDs, not Supabase auth UUIDs
 
 -- DROP existing table and policies
 DROP TABLE IF EXISTS public.recent_trades CASCADE;
@@ -8,7 +9,7 @@ DROP TABLE IF EXISTS public.recent_trades CASCADE;
 -- CREATE the table with CORRECT columns matching code expectations
 CREATE TABLE public.recent_trades (
   id TEXT PRIMARY KEY,
-  user_id UUID NOT NULL,
+  user_id TEXT NOT NULL,
   symbol TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('BUY', 'SELL')),
   volume DECIMAL(15, 2) NOT NULL DEFAULT 0,

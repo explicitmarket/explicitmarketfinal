@@ -20,9 +20,11 @@ import {
   Bitcoin,
   Shield,
   Gift,
-  Menu
+  Menu,
+  Flame
 } from 'lucide-react';
 import { useStore } from '../lib/store';
+import { supabase } from '../lib/supabaseClient';
 import { BotManagementTabComponent } from '../components/BotManagementTab';
 import { SignalManagementTabComponent } from '../components/SignalManagementTab';
 import { CopyTradeManagementTab } from '../components/CopyTradeManagementTab';
@@ -37,6 +39,240 @@ const AVAILABLE_PAGES = ['dashboard', 'trade', 'wallet', 'signals', 'bot', 'copy
 const WALLET_TYPES = ['DEPOSIT', 'PURCHASE'];
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'BTC', 'ETH'];
 const NETWORKS = ['', 'ERC20', 'TRC20', 'BEP20', 'Polygon'];
+
+// TradeHistoryTab moved outside AdminPage to prevent remounting
+const TradeHistoryTab = () => {
+  const [allTrades, setAllTrades] = useState<Array<any>>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('closed_at');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const isMounted = useStore((state: any) => true); // Dummy to track mount
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchAllTrades = async () => {
+      try {
+        console.log('🔄 [START] Fetching all trades...');
+        setLoading(true);
+        
+        const { data: trades, error, status } = await supabase
+          .from('recent_trades')
+          .select('*');
+
+        console.log('🔄 [RESPONSE] Got response:', { tradesCount: trades?.length, hasError: !!error });
+
+        if (!mounted) {
+          console.log('⚠️ Component unmounted, ignoring update');
+          return;
+        }
+
+        if (error) {
+          console.error('❌ Error fetching trades:', error);
+          setAllTrades([]);
+        } else {
+          console.log('✅ [SUCCESS] Loaded', trades?.length || 0, 'trades');
+          console.log('📊 Trades:', trades);
+          setAllTrades(trades || []);
+          console.log('✅ State set. Current trades:', trades?.length);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error('❌ Exception:', err);
+        if (mounted) setAllTrades([]);
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchAllTrades();
+
+    return () => {
+      console.log('🔴 TradeHistoryTab cleanup - marking unmounted');
+      mounted = false;
+    };
+  }, []);
+
+  // Filter trades based on search query (symbol, user_id, or status)
+  // If no search query, show all trades
+  const filteredTrades = searchQuery.trim() === '' 
+    ? allTrades 
+    : allTrades.filter(trade => {
+        const query = searchQuery.toLowerCase();
+        return (
+          (trade.symbol || '').toLowerCase().includes(query) ||
+          (trade.user_id || '').toLowerCase().includes(query) ||
+          (trade.status || '').toLowerCase().includes(query)
+        );
+      });
+
+  // Sort trades - handle null/undefined values
+  const sortedTrades = [...filteredTrades].sort((a, b) => {
+    const aVal = a[sortColumn];
+    const bVal = b[sortColumn];
+    
+    // Handle null/undefined
+    if (!aVal && !bVal) return 0;
+    if (!aVal) return sortDirection === 'asc' ? 1 : -1;
+    if (!bVal) return sortDirection === 'asc' ? -1 : 1;
+    
+    // String comparison
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      return sortDirection === 'asc' 
+        ? aVal.toLowerCase().localeCompare(bVal.toLowerCase())
+        : bVal.toLowerCase().localeCompare(aVal.toLowerCase());
+    }
+    
+    // Numeric comparison (for dates and numbers)
+    const aNum = new Date(aVal).getTime ? new Date(aVal).getTime() : Number(aVal);
+    const bNum = new Date(bVal).getTime ? new Date(bVal).getTime() : Number(bVal);
+    
+    return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+  });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔴 [STATE] allTrades changed:', allTrades.length, 'trades');
+    if (allTrades.length === 0) {
+      console.trace('⚠️ allTrades was cleared! Stack trace above');
+    }
+  }, [allTrades]);
+
+  useEffect(() => {
+    console.log('📊 [RENDER] Current state:', {
+      allTrades: allTrades.length,
+      loading,
+      searchQuery,
+      filteredCount: filteredTrades.length,
+      sortedCount: sortedTrades.length
+    });
+  }, [allTrades, loading, searchQuery]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gray-100 dark:bg-[#161b22] border border-gray-300 dark:border-[#21262d] rounded-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-light tracking-tight text-gray-900 dark:text-white">Trade History</h3>
+          <div className="text-sm text-gray-600 dark:text-[#8b949e]">Total: {filteredTrades.length} trades</div>
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by symbol, user ID, or status..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#0d1117] border border-gray-300 dark:border-[#21262d] rounded text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-[#8b949e]"
+          />
+        </div>
+
+        {loading ? (
+          <div className="text-center py-8 text-gray-600 dark:text-[#8b949e]">
+            Loading trade history...
+          </div>
+        ) : allTrades.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600 dark:text-[#8b949e] mb-2">No trades found in database</p>
+            <p className="text-xs text-gray-500 dark:text-[#6e7681]">Make sure the recent_trades table has the correct schema</p>
+          </div>
+        ) : sortedTrades.length === 0 ? (
+          <div className="text-center py-8 text-gray-600 dark:text-[#8b949e]">
+            No trades match your search
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#21262d]">
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('user_id')}>
+                    User ID {sortColumn === 'user_id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('symbol')}>
+                    Symbol {sortColumn === 'symbol' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('type')}>
+                    Type {sortColumn === 'type' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('volume')}>
+                    Volume {sortColumn === 'volume' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('entry_price')}>
+                    Entry Price {sortColumn === 'entry_price' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('close_price')}>
+                    Close Price {sortColumn === 'close_price' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('profit')}>
+                    Profit/Loss {sortColumn === 'profit' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('status')}>
+                    Status {sortColumn === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('opened_at')}>
+                    Opened {sortColumn === 'opened_at' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="px-4 py-3 text-left text-gray-700 dark:text-[#8b949e] font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white" onClick={() => handleSort('closed_at')}>
+                    Closed {sortColumn === 'closed_at' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTrades.map((trade) => (
+                  <tr key={trade.id} className="border-b border-[#21262d] hover:bg-[#0d1117]/50">
+                    <td className="px-4 py-2 text-white text-xs font-mono truncate" title={trade.user_id}>
+                      {trade.user_id?.substring(0, 8)}...
+                    </td>
+                    <td className="px-4 py-2 text-white font-medium">{trade.symbol}</td>
+                    <td className="px-4 py-2">
+                      <span className={`px-2 py-1 rounded text-xs font-light tracking-widest ${
+                        trade.type === 'BUY' 
+                          ? 'bg-[#28a745]/20 text-[#28a745]' 
+                          : 'bg-[#ef5350]/20 text-[#ef5350]'
+                      }`}>
+                        {trade.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-right text-white text-sm">{trade.volume}</td>
+                    <td className="px-4 py-2 text-right text-white text-sm">${(trade.entry_price || 0).toFixed(2)}</td>
+                    <td className="px-4 py-2 text-right text-white text-sm">${(trade.close_price || 0).toFixed(2)}</td>
+                    <td className="px-4 py-2 text-right text-sm">
+                      <span className={trade.profit >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
+                        ${(trade.profit || 0).toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2">
+                      <span className={`px-2 py-1 rounded text-xs font-light ${
+                        trade.status === 'CLOSED' 
+                          ? 'bg-[#404854]/20 text-[#8b949e]' 
+                          : 'bg-[#2962ff]/20 text-[#2962ff]'
+                      }`}>
+                        {trade.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-white text-xs">
+                      {trade.opened_at ? new Date(trade.opened_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="px-4 py-2 text-white text-xs">
+                      {trade.closed_at ? new Date(trade.closed_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export function AdminPage() {
   const { 
@@ -149,6 +385,7 @@ export function AdminPage() {
     { id: 'referrals', label: 'Referral Management', icon: Gift },
     { id: 'referrers', label: 'Top Referrers', icon: Gift },
     { id: 'funded', label: 'Funded Accounts', icon: Zap },
+    { id: 'trade-history', label: 'Trade History', icon: Flame },
     { id: 'transactions', label: 'Transactions', icon: DollarSign },
     { id: 'wallets-banks', label: 'Wallets & Banks', icon: CreditCard },
     { id: 'deposit-wallets', label: 'Deposit Wallets', icon: Bitcoin },
@@ -1911,6 +2148,7 @@ export function AdminPage() {
     );
   };
 
+
   const renderTab = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -1943,6 +2181,8 @@ export function AdminPage() {
         return <ReferrersTab />;
       case 'funded':
         return <FundedAccountsTab />;
+      case 'trade-history':
+        return <TradeHistoryTab />;
       case 'transactions':
         return <TransactionTab />;
       case 'bot-management':
