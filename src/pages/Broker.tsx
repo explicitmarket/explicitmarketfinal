@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Shield, Zap, Globe } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Shield, Zap, Globe, Moon, Sun } from 'lucide-react';
 
 export function Broker() {
   const [isDark, setIsDark] = useState(true);
@@ -9,6 +9,10 @@ export function Broker() {
     const stored = localStorage.getItem('theme-mode');
     if (stored) setIsDark(stored === 'dark');
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   const bgClass = isDark ? 'bg-black text-white' : 'bg-white text-black';
   const cardBgClass = isDark
@@ -69,6 +73,14 @@ export function Broker() {
             <span className="text-xs font-light tracking-wide">Back</span>
           </a>
           <div className="flex-1" />
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className={`p-2 transition-all ${
+              isDark ? 'text-white/60 hover:text-white' : 'text-black/60 hover:text-black'
+            }`}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
           <span className="font-light tracking-widest text-sm">EXPLICIT</span>
         </div>
       </div>
@@ -276,6 +288,51 @@ export function Broker() {
           </motion.div>
         </div>
       </section>
+
+      {/* Divider */}
+      <div className={`w-full h-px ${dividerClass}`}></div>
+
+      {/* Footer */}
+      <footer className={`w-full py-16 px-8 ${isDark ? 'bg-slate-950/50' : 'bg-slate-50/50'}`}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            {[
+              { title: 'Product', links: ['Features', 'Broker', 'Security', 'API Docs'] },
+              { title: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
+              { title: 'Legal', links: [{ text: 'Terms', href: '/terms' }, 'Privacy', 'Compliance', 'Disclosures'] },
+              { title: 'Social', links: ['Twitter', 'Discord', 'LinkedIn', 'GitHub'] },
+            ].map((col, i) => (
+              <div key={i}>
+                <p className="text-xs font-light tracking-widest mb-4 opacity-60">{col.title}</p>
+                <ul className="space-y-2">
+                  {col.links.map((link, j) => (
+                    <li key={j}>
+                      {typeof link === 'object' ? (
+                        <a href={link.href} className={`text-xs font-light ${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors`}>
+                          {link.text}
+                        </a>
+                      ) : (
+                        <a href="#" className={`text-xs font-light ${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors`}>
+                          {link}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className={`border-t ${dividerClass} pt-8 flex flex-col md:flex-row items-center justify-between`}>
+            <p className={`text-xs font-light ${textMutedClass}`}>© 2025 Explicit Market. All rights reserved.</p>
+            <div className="flex gap-8 mt-6 md:mt-0">
+              <a href="/broker" className={`text-xs font-light ${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors`}>Broker</a>
+              <a href="/contact" className={`text-xs font-light ${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors`}>Support</a>
+              <a href="/terms" className={`text-xs font-light ${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors`}>Terms</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

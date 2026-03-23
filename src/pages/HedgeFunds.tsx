@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users, TrendingUp, Zap, Award, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Users, DollarSign, BarChart3, Moon, Sun } from 'lucide-react';
 
-export function About() {
+export function HedgeFunds() {
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
@@ -21,11 +21,36 @@ export function About() {
   const textMutedClass = isDark ? 'text-slate-500' : 'text-slate-600';
   const dividerClass = isDark ? 'border-slate-800/30' : 'border-slate-200/30';
 
-  const values = [
-    { icon: Users, title: 'Community First', desc: 'Empowering traders at every level' },
-    { icon: TrendingUp, title: 'Growth Focused', desc: 'Your success is our mission' },
-    { icon: Zap, title: 'Speed & Reliability', desc: 'Enterprise infrastructure for all' },
-    { icon: Award, title: 'Excellence', desc: 'Building the future of trading' },
+  const strategies = [
+    {
+      icon: TrendingUp,
+      title: 'Market Neutral',
+      desc: 'Balanced long and short positions to reduce market exposure',
+    },
+    {
+      icon: BarChart3,
+      title: 'Quantitative',
+      desc: 'Algorithm-driven trading with advanced statistical models',
+    },
+    {
+      icon: Users,
+      title: 'Multi-Strategy',
+      desc: 'Diversified approach across multiple trading methodologies',
+    },
+    {
+      icon: DollarSign,
+      title: 'High Yield',
+      desc: 'Target superior risk-adjusted returns for accredited investors',
+    },
+  ];
+
+  const benefits = [
+    'Professional portfolio management',
+    'Institutional-grade risk controls',
+    'Transparent reporting and audits',
+    'Dedicated fund managers',
+    'Performance-based fee structure',
+    'Global market access',
   ];
 
   return (
@@ -45,7 +70,7 @@ export function About() {
         }
       `}</style>
 
-      {/* Header */}
+      {/* Header with Back Button */}
       <div
         className={`fixed w-full top-0 z-50 backdrop-blur-sm ${
           isDark ? 'bg-black/80' : 'bg-white/80'
@@ -78,123 +103,55 @@ export function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-6xl md:text-7xl font-light tracking-tight mb-6 leading-tight">
-              About
-              <motion.span
-                className={`block glow-text ${isDark ? 'text-white/40' : 'text-blue-600/60'}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                Explicit Market
-              </motion.span>
-            </h1>
-            <motion.p
-              className={`text-lg font-light ${textMutedClass} max-w-2xl mx-auto leading-relaxed`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+            <h1 className="text-6xl font-light tracking-tight mb-6">Hedge Funds</h1>
+            <p className={`text-lg font-light ${textMutedClass} mb-8`}>
+              Institutional-grade fund management with professional strategies for superior capital growth
+            </p>
+            <motion.a
+              href="/auth/signup"
+              className={`inline-block px-10 py-3 text-sm font-light tracking-wide border-2 transition-all hover-lift cyber-pulse-light
+                ${isDark ? 'border-white text-white' : 'border-blue-600 text-blue-600'}`}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
-              We're building the future of trading. Our mission is to empower every trader with institutional-grade tools and infrastructure.
-            </motion.p>
+              Invest Now
+            </motion.a>
           </motion.div>
         </div>
       </section>
 
+      {/* Divider */}
       <div className={`w-full h-px ${dividerClass}`}></div>
 
-      {/* Mission & Vision */}
-      <section className="w-full py-24 px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-light tracking-tight mb-6">Our Mission</h2>
-              <p className={`text-base font-light leading-relaxed ${textMutedClass} mb-6`}>
-                To democratize access to professional-grade trading infrastructure. We believe every trader deserves access to the tools and insights that were once exclusive to institutions.
-              </p>
-              <p className={`text-base font-light leading-relaxed ${textMutedClass}`}>
-                By combining cutting-edge technology with user-centric design, we're making institutional-grade trading accessible to everyone.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className={`p-8 border rounded-lg ${cardBgClass}`}
-            >
-              <h2 className="text-4xl font-light tracking-tight mb-6">Our Vision</h2>
-              <p className={`text-base font-light leading-relaxed ${textMutedClass} mb-6`}>
-                A world where advanced trading tools and real-time market intelligence are available to everyone, regardless of their background or capital size.
-              </p>
-              <p className={`text-base font-light leading-relaxed ${textMutedClass}`}>
-                We envision Explicit Market as the essential platform where traders of all levels can execute, learn, and grow together.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <div className={`w-full h-px ${dividerClass}`}></div>
-
-      {/* Core Values */}
+      {/* Strategies */}
       <section className="w-full py-24 px-8">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="mb-16"
+          <motion.h2
+            className="text-4xl font-light tracking-tight mb-16 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-light tracking-tight mb-4">Our Values</h2>
-            <p className={`text-sm font-light ${textMutedClass} tracking-wide`}>
-              Guiding every decision we make
-            </p>
-          </motion.div>
+            Our Strategies
+          </motion.h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {values.map((value, i) => {
-              const Icon = value.icon;
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {strategies.map((strategy, i) => {
+              const Icon = strategy.icon;
               return (
                 <motion.div
                   key={i}
-                  className={`p-8 border rounded-lg ${cardBgClass} hover-lift group relative overflow-hidden cyber-pulse-light`}
-                  initial={{ opacity: 0, y: 30 }}
+                  className={`p-8 rounded-lg ${cardBgClass} hover:${isDark ? 'border-slate-700/50' : 'border-slate-300/50'} transition-all`}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   viewport={{ once: true }}
-                  whileHover={{ y: -8 }}
+                  whileHover={{ y: -3 }}
                 >
-                  <motion.div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 rounded-lg"
-                    style={{
-                      background: isDark
-                        ? 'radial-gradient(circle at center, rgba(100,200,255,0.1) 0%, transparent 70%)'
-                        : 'radial-gradient(circle at center, rgba(59,130,246,0.15) 0%, transparent 70%)',
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-
-                  <div className="relative z-10">
-                    <motion.div
-                      className={`w-8 h-8 ${isDark ? 'text-white/40' : 'text-blue-600/70'} mb-6`}
-                      whileHover={{ scale: 1.2, rotate: 10 }}
-                      transition={{ type: 'spring', stiffness: 300 }}
-                    >
-                      <Icon className="w-8 h-8" strokeWidth={1.5} />
-                    </motion.div>
-                    <h3 className="text-lg font-light tracking-wide mb-3">{value.title}</h3>
-                    <p className={`text-sm font-light leading-relaxed ${textMutedClass}`}>
-                      {value.desc}
-                    </p>
-                  </div>
+                  <Icon className="w-8 h-8 mb-4" />
+                  <h3 className="text-lg font-light tracking-wide mb-3">{strategy.title}</h3>
+                  <p className={`text-sm font-light ${textMutedClass}`}>{strategy.desc}</p>
                 </motion.div>
               );
             })}
@@ -202,57 +159,92 @@ export function About() {
         </div>
       </section>
 
+      {/* Divider */}
       <div className={`w-full h-px ${dividerClass}`}></div>
 
-      {/* Team Stats */}
+      {/* Benefits */}
       <section className="w-full py-24 px-8">
         <div className="max-w-4xl mx-auto">
-          <motion.div
+          <motion.h2
+            className="text-4xl font-light tracking-tight mb-16 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-light tracking-tight mb-12">By The Numbers</h2>
+            Why Choose Explicit Hedge Funds
+          </motion.h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { number: '500K+', label: 'Active Users' },
-                { number: '50+', label: 'Team Members' },
-                { number: '2024', label: 'Year Founded' },
-                { number: '100%', label: 'Uptime' },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <p className={`text-3xl font-light tracking-tighter mb-2 ${isDark ? 'text-white' : 'text-blue-600'}`}>
-                    {stat.number}
-                  </p>
-                  <p className={`text-xs font-light tracking-widest ${textMutedClass}`}>{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {benefits.map((benefit, i) => (
+              <motion.div
+                key={i}
+                className="flex items-start gap-4"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${isDark ? 'bg-white/40' : 'bg-blue-600/40'}`} />
+                <p className="text-base font-light">{benefit}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* Divider */}
+      <div className={`w-full h-px ${dividerClass}`}></div>
+
+      {/* Performance */}
+      <section className="w-full py-24 px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.h2
+            className="text-4xl font-light tracking-tight mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            Track Record
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { label: 'Average Annual Return', value: '18.5%' },
+              { label: 'Assets Under Management', value: '$2.4B' },
+              { label: 'Years of Experience', value: '15+' },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                className={`p-8 rounded-lg ${cardBgClass}`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <p className={`text-sm font-light ${textMutedClass} mb-3`}>{stat.label}</p>
+                <p className="text-3xl font-light tracking-tight">{stat.value}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
       <div className={`w-full h-px ${dividerClass}`}></div>
 
       {/* CTA */}
       <section className="w-full py-24 px-8">
         <div className="max-w-2xl mx-auto text-center">
           <motion.h2
-            className="text-5xl font-light tracking-tighter mb-6"
+            className="text-4xl font-light tracking-tight mb-6"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            Join our community
+            Ready to grow your wealth?
           </motion.h2>
           <motion.p
             className={`text-base font-light ${textMutedClass} mb-8`}
@@ -260,7 +252,7 @@ export function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Be part of the trading revolution
+            Join our network of sophisticated investors and start building generational wealth today.
           </motion.p>
           <motion.a
             href="/auth/signup"

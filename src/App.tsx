@@ -19,6 +19,8 @@ import { Broker } from './pages/Broker';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 import { TermsAndConditions } from './pages/TermsAndConditions';
+import { HedgeFunds } from './pages/HedgeFunds';
+import { WhatIsEaTrading } from './pages/WhatIsEaTrading';
 import { Layout } from './components/Layout';
 import { LockedPageMessage } from './components/LockedPageMessage';
 function AppContent() {
@@ -47,6 +49,8 @@ function AppContent() {
   if (pathname === '/about') return <About />;
   if (pathname === '/contact') return <Contact />;
   if (pathname === '/terms') return <TermsAndConditions />;
+  if (pathname === '/hedge-funds') return <HedgeFunds />;
+  if (pathname === '/what-is-ea-trading') return <WhatIsEaTrading />;
 
   // Not authenticated - show landing, login, or signup
   if (!isAuthenticated) {

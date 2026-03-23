@@ -216,6 +216,8 @@ export function Landing() {
             <a href="/broker" className={`${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors duration-200`}>Broker</a>
             <a href="/about" className={`${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors duration-200`}>About</a>
             <a href="/contact" className={`${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors duration-200`}>Contact</a>
+            <a href="/hedge-funds" className={`${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors duration-200`}>Hedge Funds</a>
+            <a href="/what-is-ea-trading" className={`${textMutedClass} hover:${isDark ? 'text-white' : 'text-black'} transition-colors duration-200`}>EA Trading</a>
           </div>
 
           {/* Right Actions */}
@@ -249,6 +251,8 @@ export function Landing() {
             <a href="/broker" className="block text-sm font-light">Broker</a>
             <a href="/about" className="block text-sm font-light">About</a>
             <a href="/contact" className="block text-sm font-light">Contact</a>
+            <a href="/hedge-funds" className="block text-sm font-light">Hedge Funds</a>
+            <a href="/what-is-ea-trading" className="block text-sm font-light">EA Trading</a>
             <a href="/terms" className="block text-sm font-light">Terms & Conditions</a>
             <div className={`w-full h-px ${dividerClass}`}></div>
             <button className={`w-full px-6 py-2.5 text-xs font-light tracking-wide border transition-all
