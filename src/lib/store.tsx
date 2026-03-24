@@ -1356,7 +1356,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
                 password: u.password,
                 isVerified: u.is_verified,
                 isAdmin: u.is_admin,
-                balance: balanceData?.balance || 4000,
+                balance: balanceData?.balance || 25,
                 lockedPages: Array.isArray(u.locked_pages) 
                   ? u.locked_pages 
                   : (typeof u.locked_pages === 'string' 
@@ -2146,7 +2146,7 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
               .eq('user_id', supabaseUsers.id)
               .single();
 
-            const userBalance = balanceData?.balance || 4000;
+            const userBalance = balanceData?.balance || 25;
 
             // Build loginUser object from Supabase data
             loginUser = {
@@ -2261,9 +2261,9 @@ export function StoreProvider({ children }: {children: React.ReactNode;}) {
               .from('user_balances')
               .upsert({
                 user_id: loginUser.id,
-                balance: 4000,
-                equity: 4000,
-                free_margin: 4000
+                balance: 25,
+                equity: 25,
+                free_margin: 25
               }, { onConflict: 'user_id' });
 
             if (balanceError) {
