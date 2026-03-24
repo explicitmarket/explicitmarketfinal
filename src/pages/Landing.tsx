@@ -203,10 +203,10 @@ export function Landing() {
       <nav className={`fixed w-full top-0 z-50 backdrop-blur-sm ${isDark ? 'bg-black/80' : 'bg-white/80'} border-b ${dividerClass} transition-all duration-300`}>
         <div className="max-w-6xl mx-auto px-8 py-5 flex items-center justify-between">
           {/* Logo - Ultra Minimal */}
-          <div className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
             <div className={`w-2 h-6 ${isDark ? 'bg-white' : 'bg-black'}`}></div>
             <span className="font-light tracking-widest text-sm">EXPLICIT</span>
-          </div>
+          </a>
 
           {/* Desktop Menu */}
           <div className={`hidden md:flex items-center gap-12 text-xs font-light tracking-wide`}>
@@ -230,10 +230,10 @@ export function Landing() {
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <button className={`hidden sm:flex px-6 py-2 text-xs font-light tracking-wide border transition-all hover-lift
+            <a href="/login" className={`hidden sm:flex px-6 py-2 text-xs font-light tracking-wide border transition-all hover-lift
               ${isDark ? 'border-white/20 text-white hover:bg-white/5' : 'border-black/20 text-black hover:bg-black/5'}`}>
               Access Platform
-            </button>
+            </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2"
@@ -259,10 +259,10 @@ export function Landing() {
             <a href="/about-trade-copyings" className="block text-sm font-light">Copy Trading</a>
             <a href="/terms" className="block text-sm font-light">Terms & Conditions</a>
             <div className={`w-full h-px ${dividerClass}`}></div>
-            <button className={`w-full px-6 py-2.5 text-xs font-light tracking-wide border transition-all
+            <a href="/login" className={`w-full block px-6 py-2.5 text-xs font-light tracking-wide border transition-all text-center
               ${isDark ? 'border-white/20 text-white hover:bg-white/5' : 'border-black/20 text-black hover:bg-black/5'}`}>
               Access Platform
-            </button>
+            </a>
           </div>
         )}
       </nav>
@@ -327,7 +327,8 @@ export function Landing() {
               transition={{ duration: 0.8, delay: 0.5 }}
               viewport={{ once: true }}
             >
-              <motion.button 
+              <motion.a 
+                href="/auth/signup"
                 className={`group px-8 py-3 text-sm font-light tracking-wide transition-all border-2 flex items-center gap-2 hover-lift ${isDark ? 'cyber-pulse-white' : 'cyber-pulse-light'}
                   ${isDark ? 'border-white text-white' : 'border-black text-black'}`}
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -340,19 +341,20 @@ export function Landing() {
                 >
                   <ArrowRight className="w-4 h-4" />
                 </motion.div>
-              </motion.button>
-              <motion.button 
-                className={`px-8 py-3 text-sm font-light tracking-wide transition-all hover-lift
+              </motion.a>
+              <motion.a 
+                href="/auth/login"
+                className={`px-8 py-3 text-sm font-light tracking-wide transition-all hover-lift inline-block
                   ${isDark ? 'text-slate-500 hover:text-white' : 'text-slate-600 hover:text-black'}`}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                View Demo → 
-              </motion.button>
+                Access Platform → 
+              </motion.a>
             </motion.div>
           </motion.div>
 
-          {/* Hero Image Placeholder - Cyber Visual */}
+          {/* Hero Image with Animations */}
           <motion.div 
             className={`mt-24 rounded-lg overflow-hidden border hover-lift ${isDark ? 'cyber-pulse' : 'cyber-pulse-light'} ${isDark ? 'border-slate-800/50' : 'border-slate-200/50'}`}
             initial={{ opacity: 0, y: 40 }}
@@ -361,9 +363,13 @@ export function Landing() {
             viewport={{ once: true }}
             whileHover={{ y: -8 }}
           >
-            <div className={`w-full aspect-video cyber-grid ${isDark ? 'bg-gradient-to-br from-slate-900/50 to-black' : 'bg-gradient-to-br from-slate-100 to-slate-50'} 
-              flex items-center justify-center relative overflow-hidden`}>
-              {/* Animated Cyber Grid Effect */}
+            <div className={`w-full aspect-video relative overflow-hidden`}>
+              <img 
+                src="/src/components/pic/IMG_1188.png" 
+                alt="Explicit Market Dashboard" 
+                className="w-full h-full object-cover"
+              />
+              {/* Animated Cyber Grid Effect Overlay */}
               <motion.div 
                 className="absolute inset-0 opacity-20 floating-grid"
                 style={{
@@ -371,22 +377,6 @@ export function Landing() {
                   backgroundSize: '40px 40px'
                 }}
               />
-
-              {/* Placeholder text */}
-              <motion.div 
-                className="text-center z-10"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, repeatType: 'loop' }}
-              >
-                <motion.div 
-                  className={`text-4xl font-light mb-4 glow-text ${isDark ? 'text-white/30' : 'text-black/20'}`}
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                >
-                  ∿ ∿ ∿
-                </motion.div>
-                <p className={`text-sm font-light ${textMutedClass}`}>Dashboard Preview</p>
-              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -702,22 +692,24 @@ export function Landing() {
             transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <motion.button 
-              className={`px-10 py-3 text-sm font-light tracking-wide border-2 transition-all hover-lift ${isDark ? 'cyber-pulse-white' : 'cyber-pulse-light'}
+            <motion.a 
+              href="/auth/signup"
+              className={`px-8 py-3 text-sm font-light tracking-wide border-2 transition-all hover-lift inline-block ${isDark ? 'cyber-pulse-white' : 'cyber-pulse-light'}
                 ${isDark ? 'border-white text-white' : 'border-black text-black'}`}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
               Start Free Trial
-            </motion.button>
-            <motion.button 
-              className={`px-10 py-3 text-sm font-light tracking-wide transition-all hover-lift
+            </motion.a>
+            <motion.a 
+              href="/contact"
+              className={`px-10 py-3 text-sm font-light tracking-wide transition-all hover-lift inline-block
                 ${isDark ? 'text-slate-500 hover:text-white' : 'text-slate-600 hover:text-black'}`}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
               Schedule Demo
-            </motion.button>
+            </motion.a>
           </motion.div>
         </div>
       </section>

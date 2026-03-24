@@ -84,7 +84,7 @@ export function LoginPage() {
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <span className="font-light tracking-widest text-sm">EXPLICIT</span>
+          <span className="font-light tracking-widest text-sm"><a href="/" className="hover:opacity-70 transition-opacity">EXPLICIT</a></span>
         </div>
       </div>
 
